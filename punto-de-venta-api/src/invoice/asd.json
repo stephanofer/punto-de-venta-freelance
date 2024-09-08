@@ -1,0 +1,76 @@
+{
+  "invoiceId": 49,
+  "serialNumber": "1-00000006",
+  "issueDateTime": "2023-10-01T12:00:00.000Z",
+  "remainingBalance": "100",
+  "statusInvoiceId": 1,
+  "typeInvoiceId": 1,
+  "registeredCustomerId": null,
+  "statusInvoice": {
+    "statusInvoiceId": 1,
+    "name": "Pagada"
+  },
+  "typeInvoice": {
+    "typeInvoiceId": 1,
+    "name": "Comprobante"
+  },
+  "anonymousCustomer": {
+    "anonymousCustomerId": 43,
+    "name": "Jhonatan Fernandez",
+    "invoiceId": 49
+  },
+  "registeredCustomer": null,
+  "invoiceDetails": [
+    {
+      "invoiceDetailId": 65,
+      "invoiceId": 49,
+      "productId": 100,
+      "quantity": 2,
+      "unitPrice": "50",
+      "subTotal": "100",
+      "product": {
+        "productId": 100,
+        "name": "2313213",
+        "categoryId": 1,
+        "brandId": 1,
+        "unitId": 1,
+        "subUnitId": 2,
+        "stock": 1,
+        "sub_stock": 1,
+        "cost_price": "1",
+        "quantity_for_unit": 3213123,
+        "selling_price_for_1": "32",
+        "selling_price_for_3": "32",
+        "selling_price_for_6": "3",
+        "selling_price_for_12": "32",
+        "selling_price_for_unit": "3"
+      }
+    },
+    {
+      "invoiceDetailId": 66,
+      "invoiceId": 49,
+      "productId": 100,
+      "quantity": 2,
+      "unitPrice": "50",
+      "subTotal": "100",
+      "product": {
+        "productId": 100,
+        "name": "2313213",
+        "categoryId": 1,
+        "brandId": 1,
+        "unitId": 1,
+        "subUnitId": 2,
+        "stock": 1,
+        "sub_stock": 1,
+        "cost_price": "1",
+        "quantity_for_unit": 3213123,
+        "selling_price_for_1": "32",
+        "selling_price_for_3": "32",
+        "selling_price_for_6": "3",
+        "selling_price_for_12": "32",
+        "selling_price_for_unit": "3"
+      }
+    }
+  ],
+  "payment": []
+}

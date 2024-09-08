@@ -1,0 +1,281 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Product {
+  productId              Int      @id @default(autoincrement())
+  name                   String   @unique
+  category               Category @relation(fields: [categoryId], references: [categoryId])
+  categoryId             Int
+  brand                  Brand    @relation(fields: [brandId], references: [brandId])
+  brandId                Int
+  unit                   Unit     @relation(fields: [unitId], references: [unitId])
+  unitId                 Int
+  subUnit                SubUnit  @relation(fields: [subUnitId], references: [subUnitId])
+  subUnitId              Int
+  stock                  Int
+  sub_stock              Int
+  cost_price             Decimal  @db.Decimal(10, 2)
+  quantity_for_unit      Int
+  selling_price_for_1    Decimal  @db.Decimal(10, 2)
+  selling_price_for_3    Decimal  @db.Decimal(10, 2)
+  selling_price_for_6    Decimal  @db.Decimal(10, 2)
+  selling_price_for_12   Decimal  @db.Decimal(10, 2)
+  selling_price_for_unit Decimal  @db.Decimal(10, 2)
+
+  InvoiceDetail InvoiceDetail[]
+}
+
+model Category {
+  categoryId Int       @id @default(autoincrement())
+  name       String    @unique
+  Product    Product[]
+}
+
+model Brand {
+  brandId Int       @id @default(autoincrement())
+  name    String    @unique
+  Product Product[]
+}
+
+model Unit {
+  unitId      Int       @id @default(autoincrement())
+  name        String    @unique
+  namePlural  String    @unique
+  abbrevation String    @unique
+  Product     Product[]
+}
+
+model SubUnit {
+  subUnitId   Int       @id @default(autoincrement())
+  name        String    @unique
+  namePlural  String    @unique
+  abbrevation String    @unique
+  Product     Product[]
+}
+
+model Invoice {
+  invoiceId Int @id @default(autoincrement())
+
+  serialNumber  String   @unique
+  issueDateTime DateTime
+
+  remainingBalance Decimal? @db.Decimal(10, 2)
+
+  statusInvoice   StatusInvoice @relation(fields: [statusInvoiceId], references: [statusInvoiceId])
+  statusInvoiceId Int
+
+  typeInvoice   TypeInvoice @relation(fields: [typeInvoiceId], references: [typeInvoiceId])
+  typeInvoiceId Int
+
+  anonymousCustomer AnonymousCustomer?
+
+  registeredCustomer   RegisteredCustomer? @relation(fields: [registeredCustomerId], references: [customerId])
+  registeredCustomerId Int?
+
+  invoiceDetails InvoiceDetail[]
+  payment        Payment[]
+
+  @@map("invoices")
+}
+
+model InvoiceDetail {
+  invoiceDetailId Int @id @default(autoincrement())
+
+  invoice   Invoice @relation(fields: [invoiceId], references: [invoiceId])
+  invoiceId Int
+
+  product   Product @relation(fields: [productId], references: [productId])
+  productId Int
+
+  quantity  Int
+  unitPrice Decimal @db.Decimal(10, 2)
+  subTotal  Decimal @db.Decimal(10, 2)
+}
+
+model PaymentMethod {
+  paymentMethodId Int    @id @default(autoincrement())
+  name            String
+
+  payments      Payment[]
+  CreditPayment CreditPayment[]
+
+  @@map("paymentMethods")
+}
+
+model Payment {
+  paymentId Int @id @default(autoincrement())
+
+  invoice   Invoice @relation(fields: [invoiceId], references: [invoiceId])
+  invoiceId Int
+
+  amount      Decimal  @db.Decimal(10, 2)
+  paymentDate DateTime
+
+  paymentMethod   PaymentMethod @relation(fields: [paymentMethodId], references: [paymentMethodId])
+  paymentMethodId Int
+
+  CashRegisterSession   CashRegisterSession @relation(fields: [CashRegisterSessionId], references: [id])
+  CashRegisterSessionId Int
+
+  @@map("payments")
+}
+
+model StatusInvoice {
+  statusInvoiceId Int    @id @default(autoincrement())
+  name            String
+
+  invoices Invoice[]
+}
+
+model TypeInvoice {
+  typeInvoiceId Int    @id @default(autoincrement())
+  name          String
+
+  invoices Invoice[]
+}
+
+model AnonymousCustomer {
+  anonymousCustomerId Int    @id @default(autoincrement())
+  name                String
+
+  invoice   Invoice @relation(fields: [invoiceId], references: [invoiceId])
+  invoiceId Int     @unique
+
+  @@map("anonymousCustomers")
+}
+
+model RegisteredCustomer {
+  customerId Int    @id @default(autoincrement())
+  fullName   String
+  address    String
+  phone      String
+
+  invoices Invoice[]
+  credit   Credit?
+
+  @@map("registeredCustomers")
+}
+
+model Credit {
+  creditId Int @id @default(autoincrement())
+
+  customer   RegisteredCustomer @relation(fields: [customerId], references: [customerId])
+  customerId Int                @unique
+
+  creditLimit  Float
+  balance      Float
+  approvalDate DateTime
+
+  statusCredit   StatusCredit @relation(fields: [statusCreditId], references: [statusCreditId])
+  statusCreditId Int
+
+  CreditPayment CreditPayment[]
+
+  @@map("credits")
+}
+
+model CreditPayment {
+  creditPaymentId Int @id @default(autoincrement())
+
+  Credit   Credit @relation(fields: [creditId], references: [creditId])
+  creditId Int
+
+  paymentAmount Float
+  paymentDate   DateTime
+
+  PaymentMethod   PaymentMethod @relation(fields: [paymentMethodId], references: [paymentMethodId])
+  paymentMethodId Int
+
+  CashRegisterSession   CashRegisterSession @relation(fields: [CashRegisterSessionId], references: [id])
+  CashRegisterSessionId Int
+}
+
+model StatusCredit {
+  statusCreditId Int    @id @default(autoincrement())
+  name           String @unique
+
+  credits Credit[]
+}
+
+model Sequence {
+  name         String @id
+  currentValue Int
+}
+
+model CashRegister {
+  id Int @id @default(autoincrement())
+
+  Status   CashRegisterStatus @relation(fields: [statusId], references: [id])
+  statusId Int
+
+  location String
+
+  CashRegisterSession CashRegisterSession[]
+}
+
+model CashRegisterStatus {
+  id   Int    @id @default(autoincrement())
+  name String
+
+  CashRegister CashRegister[]
+}
+
+model CashRegisterSession {
+  id Int @id @default(autoincrement())
+
+  CashRegister   CashRegister @relation(fields: [cashRegisterId], references: [id])
+  cashRegisterId Int
+
+  openingDate DateTime
+  closingDate DateTime?
+
+  initialAmount Decimal @db.Decimal(10, 2)
+  finalAmount   Decimal? @db.Decimal(10, 2)
+
+  Status   CashRegisterSessionStatus @relation(fields: [statusId], references: [id])
+  statusId Int
+
+  CashMovement  CashMovement[]
+  Payments      Payment[]
+  CreditPayment CreditPayment[]
+}
+
+model CashRegisterSessionStatus {
+  id   Int    @id @default(autoincrement())
+  name String
+
+  CashRegisterSession CashRegisterSession[]
+}
+
+model CashMovement {
+  id Int @id @default(autoincrement())
+
+  CashRegisterSession   CashRegisterSession @relation(fields: [cashRegisterSessionId], references: [id])
+  cashRegisterSessionId Int
+
+  MovementType   MovementType @relation(fields: [movementTypeId], references: [id])
+  movementTypeId Int
+
+  amount    Decimal @db.Decimal(10, 2)
+  reason    String
+  timestamp DateTime
+}
+
+model MovementType {
+  id   Int    @id @default(autoincrement())
+  name String
+
+  CashMovement CashMovement[]
+}

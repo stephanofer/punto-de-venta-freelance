@@ -1,0 +1,15 @@
+services:
+  db:
+    image: bitnami/postgresql:16.4.0-debian-12-r4
+    environment:
+      POSTGRES_USER: vendimia
+      POSTGRES_PASSWORD: jhonatan2k24....j
+      POSTGRES_DB: pos
+    volumes:
+      - postgres_data:/bitnami/postgresql
+    ports:
+      - 5432:5432
+
+
+volumes:
+  postgres_data:

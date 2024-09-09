@@ -1,35 +1,32 @@
 import { Button } from "@/components/ui/button";
+import { formatMoney } from "@/services/useUtils";
 import { ShoppingCartIcon } from "lucide-react";
-import { useProductStore } from "../services/useProductStore";
 import { useDetailStore } from "../services/useDetailStore";
 
+
 export function SaleSummary() {
+  const productsLength = useDetailStore((state) => state.invoiceDetailLenght);
+  const total = useDetailStore((state) => state.total);
+  const setDialogInvoiceDetail = useDetailStore((state) => state.setDialogInvoiceDetail);
+  // console.log(total);
 
-  const productsLength = useProductStore((state) => state.productLength)
-  const total = useDetailStore((state) => state.invoiceDetailLenght)
-  console.log(total);
-
-  const moneyFormatted = (number: number) => {
-
-    const formatted = new Intl.NumberFormat("es-PE", {
-      style: "currency",
-      currency: "PEN",
-      minimumFractionDigits: 2,
-      maximumFractionDigits: 2,
-    }).format(number);
-
-    return formatted
-
-  }
+  const handleClick = () => {
+    console.log("click");
+    setDialogInvoiceDetail()
+  };
 
   return (
     <div className="flex items-center gap-4 ml-auto ">
       <div className="flex items-center gap-2">
         <ShoppingCartIcon className="w-5 h-5 text-muted-foreground" />
-        <span>{`${productsLength} Productos`}</span>
-        <span className="font-bold text-xl">{`${moneyFormatted(total)}`}</span>
+        <span>{`${productsLength} ${
+          productsLength === 1 ? "Producto" : "Productos"
+        }`}</span>
+        <span className="font-bold text-xl">{formatMoney(total)}</span>
       </div>
-      <Button size={"lg"}>Realizar Venta</Button>
+      <Button size={"lg"} onClick={() => handleClick()}>
+        Realizar Venta
+      </Button>
     </div>
   );
 }

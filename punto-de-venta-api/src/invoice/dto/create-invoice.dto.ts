@@ -21,6 +21,9 @@ class CreateInvoiceDetailDto {
 
   @IsNumber()
   subTotal: number;
+  
+  @IsNumber()
+  profitAmount: number;
 }
 
 class createAnonymousCustomerDto {

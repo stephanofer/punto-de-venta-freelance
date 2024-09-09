@@ -16,6 +16,8 @@ import {
   useValidateCashRegister,
 } from "../services/queries";
 import { useDetailStore } from "./services/useDetailStore";
+import { GenerateInvoice } from "./components/GenerateInvoice";
+import { DialogInvoiceDetail } from "./components/DialogInvoiceDetail";
 
 export function DashboardContainer() {
   // Validar si este dia hay una caja con un inicio de sesion
@@ -28,9 +30,13 @@ export function DashboardContainer() {
 
   //productos de una venta
   const productsInvoice = useDetailStore((state) => state.productsInvoice);
-  const removeProductsInvoice = useDetailStore((state) => state.removeProductsInvoice);
+  const removeProductsInvoice = useDetailStore(
+    (state) => state.removeProductsInvoice
+  );
   const setProductEdit = useDetailStore((state) => state.setProductEdited);
   const setDialogTwo = useDetailStore((state) => state.setDialogTwo);
+
+  // const [dialogGenerateInvopice, setDialogGenerateInvopice] = useState(false);
 
   useEffect(() => {
     if (validateCashRegister === false) {
@@ -44,7 +50,7 @@ export function DashboardContainer() {
       header: "Codigo",
     },
     {
-      accessorKey: "product.name",
+      accessorKey: "productName",
       header: "Nombre",
     },
     {
@@ -63,9 +69,7 @@ export function DashboardContainer() {
       cell: ({ row }) => {
         const rowCurrent = row.original;
         return (
-          <Badge variant="outline">
-            {formatMoney(rowCurrent.subTotal)}
-          </Badge>
+          <Badge variant="outline">{formatMoney(rowCurrent.subTotal)}</Badge>
         );
       },
     },
@@ -73,26 +77,20 @@ export function DashboardContainer() {
       id: "actions",
       header: "Acciones",
 
-      cell: ({row}) => {
-
+      cell: ({ row }) => {
         const currentRow = row.original;
 
         const handleEditar = () => {
-          setProductEdit(currentRow)
-          setDialogTwo()
-
-        }
+          setProductEdit(currentRow);
+          setDialogTwo();
+        };
 
         const handleDelete = () => {
-          removeProductsInvoice(currentRow.product.productId)
-        }
+          removeProductsInvoice(currentRow);
+        };
         return (
           <div className="flex gap-2 pr-1">
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => handleEditar()}
-            >
+            <Button variant="outline" size="sm" onClick={() => handleEditar()}>
               <FilePenIcon className="w-4 h-4" />
               Editar
             </Button>
@@ -131,7 +129,7 @@ export function DashboardContainer() {
               extraButton={<AddProduct />}
               filterBy={{
                 label: "Filtrar por producto",
-                value: "product.name",
+                value: "productName",
               }}
               title={`Ticket #${dataInvoiceNumber || "Error"}`}
             />
@@ -143,78 +141,9 @@ export function DashboardContainer() {
         <SaleSummary />
       </footer>
 
-      {/* <Dialog open={true}>
-        <DialogContent className="sm:max-w-md">
-          <DialogHeader>
-            <DialogTitle>Generar Comprobante</DialogTitle>
-            <DialogDescription>
-              Revise los detalles de la venta antes de completar la transacción.
-            </DialogDescription>
-          </DialogHeader>
-          <div className="grid gap-4">
-            <div className="grid grid-cols-2 gap-2">
-              <div className="font-medium">Cliente:</div>
-              <div>Stephano Fernandez</div>
-              <div className="font-medium">Tipo de Pago:</div>
-              <div>Contado</div>
-              <div className="font-medium">Fecha y Hora:</div>
-              <div>{format(new Date(), "dd/MM/yyyy HH:mm:ss")}</div>
-            </div>
-            <Table className="table-fixed">
-              <TableHeader>
-                <TableRow>
-                  <TableHead>Producto</TableHead>
-                  <TableHead>Cantidad</TableHead>
-                  <TableHead>Total</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                <TableRow>
-                  <TableCell className="font-medium">Ajinomen Gallina</TableCell>
-                  <TableCell>50 Cajas</TableCell>
-                  <TableCell>S/ 1625.00</TableCell>
-                </TableRow>
-                <TableRow>
-                  <TableCell className="font-medium">Lejía Clorox chica</TableCell>
-                  <TableCell>10 Cajas</TableCell>
-                  <TableCell>S/ 180.00</TableCell>
-                </TableRow>
-                <TableRow>
-                  <TableCell className="font-medium">La patrona 1 litro</TableCell>
-                  <TableCell>1 Caja y 6 Unidades</TableCell>
-                  <TableCell>S/ 132.00</TableCell>
-                </TableRow>
-                <TableRow>
-                  <TableCell className="font-medium">Capri 900ml</TableCell>
-                  <TableCell>20 Cajas</TableCell>
-                  <TableCell>S/ 1,900.00</TableCell>
-                </TableRow>
-              </TableBody>
-              <TableFooter>
-                <TableRow>
-                  <TableCell colSpan={2} className="font-medium text-right">
-                    Total:
-                  </TableCell>
-                  <TableCell className="font-medium">S/ 3837.00</TableCell>
-                </TableRow>
-              </TableFooter>
-            </Table>
-          </div>
-          <DialogFooter>
-            <Button variant="destructive" size="sm">
-              Cancelar
-            </Button>
-            <Button variant="outline" size="sm">
-              {" "}
-              No Imprimir
-            </Button>
-            <Button variant="outline" size="sm">
-              {" "}
-              Imprimir
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog> */}
+      <GenerateInvoice />
+
+      <DialogInvoiceDetail/>
     </div>
   );
 }

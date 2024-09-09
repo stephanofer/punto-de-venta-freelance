@@ -142,6 +142,13 @@ export class ProductsService {
       throw new NotFoundException(`No se encontró el producto`);
     }
 
+    await this.prisma.invoiceDetail.updateMany({
+      where: { 
+        productId: id
+       },
+      data: { productId: null },
+    });
+
     return await this.prisma.product.delete({
       where: { productId: id },
       include: {

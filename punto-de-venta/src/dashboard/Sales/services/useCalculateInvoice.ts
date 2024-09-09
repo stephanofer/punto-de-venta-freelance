@@ -5,6 +5,7 @@ type Props = {
   unidadesGrandes: number;
   subUnidades: number;
   product: ProductsGet | null;
+  variant: "" | "1" | "2" | "3";
 };
 
 type PropsAmountFormat = {
@@ -14,13 +15,21 @@ type PropsAmountFormat = {
   product: ProductsGet | null;
 };
 
+type PropsSubUnidades = {
+  unidadesGrandes: number;
+  subUnidades: number;
+  variant: "" | "1" | "2" | "3";
+  productoInfo: ProductsGet | null;
+};
+
 export function useCalculateInvoice({
   unidadesGrandes,
   subUnidades,
   product,
+  variant
 }: Props) {
   if (product) {
-    return calcularSubtotal(unidadesGrandes, subUnidades, product);
+    return calcularSubtotal(unidadesGrandes, subUnidades, product, variant);
   }
 }
 
@@ -45,4 +54,26 @@ export function useAmountFormat({
 
     return "Complete las cantidades...";
   }
+}
+
+export function useCalcularTotalSubunidades({
+  unidadesGrandes,
+  subUnidades,
+  productoInfo,
+  variant,
+}: PropsSubUnidades) {
+  const subUnidadesDeUnidadesGrandes =
+      unidadesGrandes * (productoInfo?.quantity_for_unit ?? 0);
+  const totalSubunidades = subUnidadesDeUnidadesGrandes + subUnidades;
+
+
+  if (unidadesGrandes > 0 && subUnidades > 0 && variant === "3") {
+    return totalSubunidades;
+  } else if (unidadesGrandes > 0 && variant === "2") {
+    return subUnidadesDeUnidadesGrandes;
+  } else if (subUnidades > 0 && variant === "1") {
+  return subUnidades;
+  }
+
+  return 0;
 }

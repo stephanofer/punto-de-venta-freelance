@@ -96,12 +96,13 @@ model InvoiceDetail {
   invoice   Invoice @relation(fields: [invoiceId], references: [invoiceId])
   invoiceId Int
 
-  product   Product @relation(fields: [productId], references: [productId])
-  productId Int
+  product   Product? @relation(fields: [productId], references: [productId])
+  productId Int?
 
   quantity  Int
   unitPrice Decimal @db.Decimal(10, 2)
   subTotal  Decimal @db.Decimal(10, 2)
+  profitAmount Decimal @db.Decimal(10, 2)
 }
 
 model PaymentMethod {

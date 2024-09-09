@@ -54,7 +54,9 @@ type InvoiceDetailVariant3 = {
 
 export type InvoiceDetail = {
   product: ProductsGet;
+  productName: string;
   subTotal: number;
+  profitAmount: number;
   amount: {
     value: number,
     label: string,

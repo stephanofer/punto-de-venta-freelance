@@ -32,22 +32,27 @@ import {
   defaultValues,
 } from "../schemas/InvoiceDetailSchem";
 import { useDetailStore } from "../services/useDetailStore";
-import { useAmountFormat, useCalculateInvoice } from "../services/useCalculateInvoice";
+import { useAmountFormat, useCalcularTotalSubunidades, useCalculateInvoice } from "../services/useCalculateInvoice";
 import { formatMoney } from "@/services/useUtils";
 
 export function AddProductForm() {
+
+  //Componente donde estaran los datos del producto
   const [productDetail, setProductDetail] = useState<ProductsGet>();
 
   const dialogTwo = useDetailStore((state) => state.dialogTwo);
   const setDialogTwo = useDetailStore((state) => state.setDialogTwo);
 
   const productSelect = useDetailStore((state) => state.productSelect);
+  const setProductSelect = useDetailStore((state) => state.setProductSelect);
+
   const productEdited = useDetailStore((state) => state.productEdited);
+  const setProductEdited = useDetailStore((state) => state.setProductEdited);
+
+  
   const setProductsInvoice = useDetailStore(
     (state) => state.setProductsInvoice
   );
-  const setProductSelect = useDetailStore((state) => state.setProductSelect);
-  const setProductEdited = useDetailStore((state) => state.setProductEdited);
   const updateProductsInvoice = useDetailStore(
     (state) => state.updateProductsInvoice
   );
@@ -95,24 +100,33 @@ export function AddProductForm() {
 
   const variant = useWatch({ control: methods.control, name: "variant" });
 
+  const amountUnit = useWatch({ control: methods.control, name: "amountUnit" });
   const amountSubUnit = useWatch({
     control: methods.control,
     name: "amountSubUnit",
   });
-  const amountUnit = useWatch({ control: methods.control, name: "amountUnit" });
   
+
   const subTotal = useCalculateInvoice({
     unidadesGrandes: parseInt(amountUnit),
     subUnidades: parseInt(amountSubUnit),
     product: productDetail || null,
+    variant: variant
   });
+
 
   const amountFormatt = useAmountFormat({
     product: productDetail || null,
-    unit: amountUnit,
-    subUnit: amountSubUnit,
+    unit: parseInt(amountUnit),
+    subUnit: parseInt(amountSubUnit),
     variant: variant
-    
+  })
+
+  const amountValue = useCalcularTotalSubunidades({
+    productoInfo: productDetail || null,
+    unidadesGrandes: parseInt(amountUnit),
+    subUnidades: parseInt(amountSubUnit),
+    variant: variant
   })
 
   const handleOpen = () => {
@@ -122,30 +136,34 @@ export function AddProductForm() {
   };
 
   const onSubmit: SubmitHandler<SchemaInvoiceDetail> = (data) => {
-    console.log(data);
 
     if (productDetail) {
-      if (productSelect) {
+      if  (productSelect) {
         switch (data.variant) {
           case "1":
             setProductsInvoice({
               ...data,
               product: productDetail,
-              subTotal: 100,
+              productName: productDetail.name,
+              subTotal: subTotal?.total ? subTotal.total : 0,
+              profitAmount: subTotal?.ganancia ? subTotal.ganancia : 0,
               amount: {
-                label: "holaxd",
-                value: 30,
-              },
+                label: amountFormatt ? amountFormatt : "",
+                value: amountValue,
+              },  
             });
             break;
           case "2":
             setProductsInvoice({
               ...data,
               product: productDetail,
-              subTotal: 100,
+              productName: productDetail.name,
+              subTotal: subTotal?.total ? subTotal.total : 0,
+              profitAmount: subTotal?.ganancia ? subTotal.ganancia : 0,
+
               amount: {
-                label: "holaxd",
-                value: 30,
+                label: amountFormatt ? amountFormatt : "",
+                value: amountValue,
               },
             });
             break;
@@ -153,46 +171,60 @@ export function AddProductForm() {
             setProductsInvoice({
               ...data,
               product: productDetail,
-              subTotal: 100,
+              productName: productDetail.name,
+              subTotal: subTotal?.total ? subTotal.total : 0,
+              profitAmount: subTotal?.ganancia ? subTotal.ganancia : 0,
+
               amount: {
-                label: "holaxd",
-                value: 30,
+                label: amountFormatt ? amountFormatt : "",
+                value: amountValue,
               },
             });
             break;
         }
-      } else {
+      } else if(productEdited){
         switch (data.variant) {
           case "1":
-            updateProductsInvoice(productDetail.productId, {
+            updateProductsInvoice(productEdited, {
               ...data,
               product: productDetail,
-              subTotal: 100,
+              productName: productDetail.name,
+              subTotal: subTotal?.total ? subTotal.total : 0,
+              profitAmount: subTotal?.ganancia ? subTotal.ganancia : 0,
+
               amount: {
-                label: "holaxd",
-                value: 30,
+                label: amountFormatt ? amountFormatt : "",
+                value: amountValue,
               },
             });
             break;
           case "2":
-            updateProductsInvoice(productDetail.productId, {
+            updateProductsInvoice(productEdited, {
               ...data,
               product: productDetail,
-              subTotal: 100,
+              productName: productDetail.name,
+              subTotal: subTotal?.total ? subTotal.total : 0,
+              profitAmount: subTotal?.ganancia ? subTotal.ganancia : 0,
+
+
               amount: {
-                label: "holaxd",
-                value: 30,
+                label: amountFormatt ? amountFormatt : "",
+                value: amountValue,
               },
             });
             break;
           case "3":
-            updateProductsInvoice(productDetail.productId, {
+            updateProductsInvoice(productEdited, {
               ...data,
               product: productDetail,
-              subTotal: 100,
+              productName: productDetail.name,
+              subTotal: subTotal?.total ? subTotal.total : 0,
+              profitAmount: subTotal?.ganancia ? subTotal.ganancia : 0,
+
+
               amount: {
-                label: "holaxd",
-                value: 30,
+                label: amountFormatt ? amountFormatt : "",
+                value: amountValue,
               },
             });
             break;
@@ -202,8 +234,6 @@ export function AddProductForm() {
     handleOpen();
   };
 
-  console.log(productEdited);
-  console.log(productSelect);
   return (
     <Dialog open={dialogTwo} onOpenChange={handleOpen}>
       <DialogContent className="sm:max-w-[800px]">
@@ -368,7 +398,7 @@ export function AddProductForm() {
                             Sub Total
                           </span>
                           <span className="font-bold text-lg">
-                            {subTotal ? formatMoney(subTotal) : "Completa las cantidades..."}
+                            {subTotal ? formatMoney(subTotal.total) : "Completa las cantidades..."}
                           </span>
                         </div>
                       </div>

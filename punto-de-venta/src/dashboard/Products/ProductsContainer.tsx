@@ -10,6 +10,7 @@ import { useState } from "react";
 import { useDeleteProduct } from "../services/mutation";
 import { ProductForm } from "./components/ProductForm";
 import { Card } from "@/components/ui/card";
+import { formatMoney, singularOrPlural } from "@/services/useUtils";
 
 export function ProductsContainer() {
   const { data, isLoading } = useProducts();
@@ -40,16 +41,7 @@ export function ProductsContainer() {
       // accessorFn: row => `${row.stock} ${row.sub_stock}`
       cell: ({ row }) => {
         const currentRow = row.original;
-        const unit =
-          currentRow.stock === 1
-            ? currentRow.unit.name
-            : currentRow.unit.namePlural;
-
-        const subUnit =
-          currentRow.sub_stock === 1
-            ? currentRow.subUnit.name
-            : currentRow.subUnit.namePlural;
-
+        const { subUnit, unit } = singularOrPlural(currentRow);
         return (
           <Badge variant="outline">
             {`${currentRow.stock} ${unit} y ${currentRow.sub_stock} ${subUnit}`}
@@ -62,12 +54,9 @@ export function ProductsContainer() {
       header: "Precio Costo",
       cell: ({ row }) => {
         const cost_price = parseFloat(row.getValue("cost_price"));
-        const formatted = new Intl.NumberFormat("es-PE", {
-          style: "currency",
-          currency: "PEN",
-          minimumFractionDigits: 2,
-          maximumFractionDigits: 2,
-        }).format(cost_price);
+
+        const formatted = formatMoney(cost_price);
+
         return <Badge variant="secondary">{formatted}</Badge>;
       },
     },
@@ -76,12 +65,8 @@ export function ProductsContainer() {
       header: "Precio Venta",
       cell: ({ row }) => {
         const cost_price = parseFloat(row.getValue("selling_price_for_unit"));
-        const formatted = new Intl.NumberFormat("es-PE", {
-          style: "currency",
-          currency: "PEN",
-          minimumFractionDigits: 2,
-          maximumFractionDigits: 2,
-        }).format(cost_price);
+        const formatted = formatMoney(cost_price);
+
         return <Badge variant="secondary">{formatted}</Badge>;
       },
     },

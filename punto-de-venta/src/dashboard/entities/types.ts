@@ -32,31 +32,36 @@ export type Utils = {
   subUnit: SubUnit;
 }
 
-
 export type ProductsGet = Omit<Product & Edit & Utils, 'variant'>
 export type ProductCreateEdit = Product & (Create | Edit)
 
-type InvoiceDetailAdd = {
-  variantAction: "add",
-  variant: string,
+type InvoiceDetailVariant1 = {
+  variant: "1",
+  amountSubUnit: string,
 }
 
-type InvoiceDetailEdit = {
-  variantAction: "edit",
-  variant: string,
+type InvoiceDetailVariant2 = {
+  variant: "2",
+  amountUnit: string,
+}
+
+type InvoiceDetailVariant3 = {
+  variant: "3",
+  amountUnit: string,
+  amountSubUnit: string,
+
 }
 
 export type InvoiceDetail = {
-  productId: number;
-  productName: string;
-  subTotal: string;
+  product: ProductsGet;
+  subTotal: number;
   amount: {
-    value: string,
+    value: number,
     label: string,
   }
 };
 
-export type InvoiceDetailAddEdit = InvoiceDetail & (InvoiceDetailAdd | InvoiceDetailEdit)
+export type InvoiceDetailAddEdit = InvoiceDetail & (InvoiceDetailVariant1 | InvoiceDetailVariant2 | InvoiceDetailVariant3)
 
 
 

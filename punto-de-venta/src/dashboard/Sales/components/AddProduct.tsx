@@ -8,19 +8,22 @@ import {
 } from "@/components/ui/dialog";
 import { ProductsGet } from "@/dashboard/entities/types";
 import { useProducts } from "@/dashboard/services/queries";
+import { formatMoney, singularOrPlural } from "@/services/useUtils";
 import { ColumnDef } from "@tanstack/react-table";
 import { MousePointerClick } from "lucide-react";
-import { useState } from "react";
-import { useProductStore } from "../services/useProductStore";
+import { useDetailStore } from "../services/useDetailStore";
 import { AddProductForm } from "./AddProductForm";
 
 export function AddProduct() {
-  const [firstOpen, setFirstOpen] = useState(false);
-  const [twoOpen, setTwoOpen] = useState(false);
+  const dialogFirst = useDetailStore((state) => state.dialogFirst);
+  // const dialogTwo = useDetailStore((state) => state.dialogTwo);
+
+  const setDialogFirst = useDetailStore((state) => state.setDiagloFirst);
+  const setDialogTwo = useDetailStore((state) => state.setDialogTwo);
+
+  const setProductSelect = useDetailStore((state) => state.setProductSelect);
 
   const { data, isLoading } = useProducts();
-
-  const selectProduct = useProductStore((state) => state.addSelect);
 
   const columns: ColumnDef<ProductsGet>[] = [
     {
@@ -34,16 +37,7 @@ export function AddProduct() {
       header: "Stock",
       cell: ({ row }) => {
         const currentRow = row.original;
-        const unit =
-          currentRow.stock === 1
-            ? currentRow.unit.name
-            : currentRow.unit.namePlural;
-
-        const subUnit =
-          currentRow.sub_stock === 1
-            ? currentRow.subUnit.name
-            : currentRow.subUnit.namePlural;
-
+        const { unit, subUnit } = singularOrPlural(currentRow);
         return (
           <Badge variant="outline">
             {`${currentRow.stock} ${unit} y ${currentRow.sub_stock} ${subUnit}`}
@@ -56,12 +50,9 @@ export function AddProduct() {
       header: "Precio Costo",
       cell: ({ row }) => {
         const cost_price = parseFloat(row.getValue("cost_price"));
-        const formatted = new Intl.NumberFormat("es-PE", {
-          style: "currency",
-          currency: "PEN",
-          minimumFractionDigits: 2,
-          maximumFractionDigits: 2,
-        }).format(cost_price);
+
+        const formatted = formatMoney(cost_price);
+
         return <Badge variant="secondary">{formatted}</Badge>;
       },
     },
@@ -70,12 +61,9 @@ export function AddProduct() {
       header: "Precio Venta",
       cell: ({ row }) => {
         const cost_price = parseFloat(row.getValue("selling_price_for_unit"));
-        const formatted = new Intl.NumberFormat("es-PE", {
-          style: "currency",
-          currency: "PEN",
-          minimumFractionDigits: 2,
-          maximumFractionDigits: 2,
-        }).format(cost_price);
+
+        const formatted = formatMoney(cost_price);
+
         return <Badge variant="secondary">{formatted}</Badge>;
       },
     },
@@ -84,15 +72,12 @@ export function AddProduct() {
       header: "Acciones",
 
       cell: ({ row }) => {
-        const productActually: ProductsGet = row.original;
+        const productActually = row.original;
 
         const handleAdd = () => {
-          selectProduct({
-            variantAction: "add",
-            ...productActually
-          });
-          setFirstOpen(false)
-          setTwoOpen(true)
+          handleFirstOpen()
+          setDialogTwo()
+          setProductSelect(productActually)
         };
 
         return (
@@ -109,25 +94,12 @@ export function AddProduct() {
 
   const handleFirstOpen = () => {
     console.log("Entrando Open");
-    setFirstOpen((firstOpen) => !firstOpen);
+    setDialogFirst();
   };
-
-
-  // onClick={() => {
-  //   setSelectedProduct({
-  //     id: 1,
-  //     description: "asd",
-  //     image: "asd",
-  //     name: "asd",
-  //     price: 10,
-  //   });
-  //   setFirstOpen((firstOpen) => !firstOpen);
-  //   setTwoOpen((twoOpen) => !twoOpen);
-  // }}
 
   return (
     <div>
-      <Dialog open={firstOpen} onOpenChange={handleFirstOpen}>
+      <Dialog open={dialogFirst} onOpenChange={handleFirstOpen}>
         {" "}
         <DialogTrigger asChild>
           <Button className="h-11 rounded-md px-5">
@@ -137,26 +109,29 @@ export function AddProduct() {
             </kbd>
           </Button>
         </DialogTrigger>
-        <DialogContent className="md:max-w-[1200px] xl:max-w-[1500px]">
-          <div className="grid gap-4">
-            {isLoading ? (
-              "Cargando..."
-            ) : (
-              <AllTable
-                columns={columns}
-                data={data || []}
-                filterBy={{
-                  label: "Filtrar por producto",
-                  value: "name",
-                }}
-                title={`Agregar un Producto a la venta`}
-              />
-            )}
-          </div>
+        <DialogContent
+          className="md:max-w-[1200px] xl:max-w-[1500px]"
+          aria-describedby="asd"
+        >
+            <div className="grid gap-4">
+              {isLoading ? (
+                "Cargando..."
+              ) : (
+                  <AllTable
+                    columns={columns}
+                    data={data || []}
+                    filterBy={{
+                      label: "Filtrar por producto",
+                      value: "name",
+                    }}
+                    title={`Agregar un Producto a la venta`}
+                  />
+              )}
+            </div>
         </DialogContent>
       </Dialog>
 
-      <AddProductForm open={twoOpen} setOpen={setTwoOpen} />
+      <AddProductForm />
     </div>
   );
 }

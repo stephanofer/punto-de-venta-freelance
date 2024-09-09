@@ -5,7 +5,8 @@ import { AllTable } from "@/components/app/AllTables";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import { InvoiceDetail } from "@/dashboard/entities/types";
+import { InvoiceDetailAddEdit } from "@/dashboard/entities/types";
+import { formatMoney } from "@/services/useUtils";
 import { ColumnDef } from "@tanstack/react-table";
 import { FilePenIcon, TrashIcon } from "lucide-react";
 import { useEffect, useState } from "react";
@@ -14,46 +15,22 @@ import {
   useGetNextInvoiceNumber,
   useValidateCashRegister,
 } from "../services/queries";
-import { useProductStore } from "./services/useProductStore";
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableFooter,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
-import { format } from "date-fns";
+import { useDetailStore } from "./services/useDetailStore";
 
 export function DashboardContainer() {
+  // Validar si este dia hay una caja con un inicio de sesion
   const { data: validateCashRegister } = useValidateCashRegister();
-
+  //Traer el numero de ticket actual
   const { data: dataInvoiceNumber, isLoading: isLoadingInvoiceNumer } =
     useGetNextInvoiceNumber();
 
   const [cashRegisterDialog, setCashRegisterDialog] = useState(false);
 
-  const dateSaleProduct = useProductStore((state) => state.saleProducts);
-
-  const moneyFormatted = (number: number) => {
-    const formatted = new Intl.NumberFormat("es-PE", {
-      style: "currency",
-      currency: "PEN",
-      minimumFractionDigits: 2,
-      maximumFractionDigits: 2,
-    }).format(number);
-
-    return formatted;
-  };
+  //productos de una venta
+  const productsInvoice = useDetailStore((state) => state.productsInvoice);
+  const removeProductsInvoice = useDetailStore((state) => state.removeProductsInvoice);
+  const setProductEdit = useDetailStore((state) => state.setProductEdited);
+  const setDialogTwo = useDetailStore((state) => state.setDialogTwo);
 
   useEffect(() => {
     if (validateCashRegister === false) {
@@ -61,13 +38,13 @@ export function DashboardContainer() {
     }
   }, [validateCashRegister]);
 
-  const columns: ColumnDef<InvoiceDetail>[] = [
+  const columns: ColumnDef<InvoiceDetailAddEdit>[] = [
     {
-      accessorKey: "productId",
+      accessorKey: "product.productId",
       header: "Codigo",
     },
     {
-      accessorKey: "productName",
+      accessorKey: "product.name",
       header: "Nombre",
     },
     {
@@ -85,10 +62,9 @@ export function DashboardContainer() {
       header: "Sub Total",
       cell: ({ row }) => {
         const rowCurrent = row.original;
-
         return (
           <Badge variant="outline">
-            {moneyFormatted(parseFloat(rowCurrent.subTotal))}
+            {formatMoney(rowCurrent.subTotal)}
           </Badge>
         );
       },
@@ -97,13 +73,25 @@ export function DashboardContainer() {
       id: "actions",
       header: "Acciones",
 
-      cell: () => {
+      cell: ({row}) => {
+
+        const currentRow = row.original;
+
+        const handleEditar = () => {
+          setProductEdit(currentRow)
+          setDialogTwo()
+
+        }
+
+        const handleDelete = () => {
+          removeProductsInvoice(currentRow.product.productId)
+        }
         return (
           <div className="flex gap-2 pr-1">
             <Button
               variant="outline"
               size="sm"
-              // onClick={() => handleEditar()}
+              onClick={() => handleEditar()}
             >
               <FilePenIcon className="w-4 h-4" />
               Editar
@@ -111,7 +99,7 @@ export function DashboardContainer() {
             <Button
               variant="destructive"
               size="sm"
-              // onClick={() => handleDelete()}
+              onClick={() => handleDelete()}
             >
               <TrashIcon className="w-4 h-4" />
               Eliminar
@@ -131,6 +119,7 @@ export function DashboardContainer() {
         open={cashRegisterDialog}
         onOpenChange={setCashRegisterDialog}
       />
+
       <main className="p-4 relative" style={{ height: "calc(100vh - 80px)" }}>
         {isLoadingInvoiceNumer ? (
           "Cargando...."
@@ -138,11 +127,11 @@ export function DashboardContainer() {
           <Card>
             <AllTable
               columns={columns}
-              data={dateSaleProduct}
+              data={productsInvoice}
               extraButton={<AddProduct />}
               filterBy={{
                 label: "Filtrar por producto",
-                value: "name",
+                value: "product.name",
               }}
               title={`Ticket #${dataInvoiceNumber || "Error"}`}
             />

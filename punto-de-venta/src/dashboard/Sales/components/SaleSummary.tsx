@@ -1,11 +1,13 @@
 import { Button } from "@/components/ui/button";
 import { ShoppingCartIcon } from "lucide-react";
 import { useProductStore } from "../services/useProductStore";
+import { useDetailStore } from "../services/useDetailStore";
 
 export function SaleSummary() {
 
   const productsLength = useProductStore((state) => state.productLength)
-  const total = useProductStore((state) => state.total)
+  const total = useDetailStore((state) => state.invoiceDetailLenght)
+  console.log(total);
 
   const moneyFormatted = (number: number) => {
 

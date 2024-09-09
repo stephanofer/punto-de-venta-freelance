@@ -1,4 +1,4 @@
-import { ProductsGet } from "../entities/types";
+import { ProductsGet } from "../dashboard/entities/types";
 
 export function calcularSubtotal(
   unidadesGrandes: number = 0,
@@ -43,4 +43,30 @@ export function calcularTotalSubunidades(
     unidadesGrandes * productoInfo.quantity_for_unit;
   const totalSubunidades = subUnidadesDeUnidadesGrandes + subUnidades;
   return totalSubunidades;
+}
+
+
+
+export function singularOrPlural(product: ProductsGet) {
+  const unit =
+    product.stock === 1
+      ? product.unit.name
+      : product.unit.namePlural;
+
+  const subUnit =
+  product.sub_stock === 1
+      ? product.subUnit.name
+      : product.subUnit.namePlural;
+
+  return {unit, subUnit}
+}
+
+
+export function formatMoney(amount: number) {
+  return new Intl.NumberFormat("es-PE", {
+    style: "currency",
+    currency: "PEN",
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2,
+  }).format(amount);
 }

@@ -31,6 +31,7 @@ Es un sistema de punto de venta moderno, eficiente, personalizado, diseñado par
 const technologies = [
   { name: "React"},
   { name: "NestJS"},
+  { name: "PostgreSQL"},
 ]
 ```
 Hecho por [Stephano Fernandez](https://www.linkedin.com/in/stephano-fernandez/) 💼

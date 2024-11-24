@@ -71,7 +71,7 @@ model Invoice {
   serialNumber  String   @unique
   issueDateTime DateTime
 
-  remainingBalance Decimal? @db.Decimal(10, 2)
+  // remainingBalance Decimal? @db.Decimal(10, 2)
 
   statusInvoice   StatusInvoice @relation(fields: [statusInvoiceId], references: [statusInvoiceId])
   statusInvoiceId Int
@@ -100,7 +100,6 @@ model InvoiceDetail {
   productId Int?
 
   quantity  Int
-  unitPrice Decimal @db.Decimal(10, 2)
   subTotal  Decimal @db.Decimal(10, 2)
   profitAmount Decimal @db.Decimal(10, 2)
 }

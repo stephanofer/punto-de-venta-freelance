@@ -17,9 +17,6 @@ class CreateInvoiceDetailDto {
   quantity: number;
 
   @IsNumber()
-  unitPrice: number;
-
-  @IsNumber()
   subTotal: number;
   
   @IsNumber()
@@ -49,9 +46,9 @@ export class CreateInvoiceDto {
   @IsString()
   issueDateTime: Date;
 
-  @IsOptional()
-  @IsNumber()
-  remainingBalance: number;
+  // @IsOptional()
+  // @IsNumber()
+  // remainingBalance: number;
 
   @IsInt()
   statusInvoiceId: number;
@@ -66,17 +63,15 @@ export class CreateInvoiceDto {
   @Type(() => createAnonymousCustomerDto)
   anonymousCustomer: createAnonymousCustomerDto;
 
-  @ValidateNested({ each: true })
-  @Type(() => createPaymentDto)
-  paymentDetails: createPaymentDto;
 
   @IsOptional()
   @IsInt()
   registeredCustomerId?: number;
 
-  @IsOptional()
-  @IsString()
-  customerName?: string;
+  
+  @ValidateNested({ each: true })
+  @Type(() => createPaymentDto)
+  paymentDetails: createPaymentDto;
 
   @ValidateNested({ each: true })
   @Type(() => CreateInvoiceDetailDto)

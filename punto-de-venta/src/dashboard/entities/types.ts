@@ -30,27 +30,26 @@ export type Utils = {
   brand: Brand;
   unit: Unit;
   subUnit: SubUnit;
-}
+};
 
-export type ProductsGet = Omit<Product & Edit & Utils, 'variant'>
-export type ProductCreateEdit = Product & (Create | Edit)
+export type ProductsGet = Omit<Product & Edit & Utils, "variant">;
+export type ProductCreateEdit = Product & (Create | Edit);
 
 type InvoiceDetailVariant1 = {
-  variant: "1",
-  amountSubUnit: string,
-}
+  variant: "1";
+  amountSubUnit: string;
+};
 
 type InvoiceDetailVariant2 = {
-  variant: "2",
-  amountUnit: string,
-}
+  variant: "2";
+  amountUnit: string;
+};
 
 type InvoiceDetailVariant3 = {
-  variant: "3",
-  amountUnit: string,
-  amountSubUnit: string,
-
-}
+  variant: "3";
+  amountUnit: string;
+  amountSubUnit: string;
+};
 
 export type InvoiceDetail = {
   product: ProductsGet;
@@ -58,24 +57,56 @@ export type InvoiceDetail = {
   subTotal: number;
   profitAmount: number;
   amount: {
-    value: number,
-    label: string,
-  }
+    value: number;
+    label: string;
+  };
 };
 
-export type InvoiceDetailAddEdit = InvoiceDetail & (InvoiceDetailVariant1 | InvoiceDetailVariant2 | InvoiceDetailVariant3)
+export type InvoiceDetailAddEdit = InvoiceDetail &
+  (InvoiceDetailVariant1 | InvoiceDetailVariant2 | InvoiceDetailVariant3);
+
+export type InvoiceForm = {
+  issueDateTime: Date;
+  statusInvoiceId: number;
+  typeInvoiceId: number;
+  paymentDetails: PaymentDetails;
+  invoiceDetails: InvoiceDetailForm;
+};
+
+type InvoiceFormCustomerAnonymous = {
+  customer: "anonymous"
+  anonymousCustomer: {
+    name: string;
+  };
+};
+
+type InvoiceFormCustomerRegister = {
+  customer: "registered"
+  registerCustomerId: number;
+};
 
 
+export type PaymentDetails = {
+  amount: number;
+  paymentDate: Date;
+  paymentMethodId: number;
+  cashRegisterSessionId: number;
+};
 
-// type Table
+type InvoiceDetailForm = {
+  productId: number;
+  quantity: number;
+  subTotal: number;
+  profitAmount: number;
+};
 
-// export type TableInvoiceDetail = InvoiceDetail & TableInvoiceDetailAmount
+export type PaymentMethods = {
+  paymentMethodId: number;
+  name: string;
+};
 
-
-// type InvoiceDetailAdd = {
-//   variant = "add"
-
-// }
+export type InvoiceFormWithCustomer = InvoiceDetail &
+  (InvoiceFormCustomerAnonymous | InvoiceFormCustomerRegister);
 
 export type Category = {
   categoryId: number;

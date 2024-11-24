@@ -1,13 +1,13 @@
-import { apiClient } from "@/services/apiClient";
-import { useQuery } from "@tanstack/react-query";
 import {
   Brand,
   Category,
+  PaymentMethods,
   ProductsGet,
   SubUnit,
   Unit,
-  // Utils,
 } from "@/dashboard/entities/types";
+import { apiClient } from "@/services/apiClient";
+import { useQuery } from "@tanstack/react-query";
 import { SchemaProduct } from "../Products/schemas/ProductSchem";
 
 // const data: Utils = {
@@ -56,7 +56,13 @@ const getNextInvoiceNumber = async () => {
   return response.data;
 };
 
-const queryProduct = async (id: string): Promise<SchemaProduct> => {
+const paymentMethods = async () => {
+  const response = await apiClient.get<PaymentMethods[]>("/payment-methods");
+  return response.data;
+};
+
+const 
+queryProduct = async (id: string): Promise<SchemaProduct> => {
   const { data } = await apiClient.get<ProductsGet>(`/products/${id}`);
   return {
     variant: "edit",
@@ -134,5 +140,12 @@ export function useGetNextInvoiceNumber() {
   return useQuery({
     queryKey: ["getNextInvoiceNumber"],
     queryFn: getNextInvoiceNumber,
+  });
+}
+
+export function usePaymentMethods() {
+  return useQuery({
+    queryKey: ["paymentMethods"],
+    queryFn: paymentMethods,
   });
 }
